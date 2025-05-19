@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+}
+
+.valid-feedback, 
+.invalid-feedback {
+  display: none;
+}
+
+.filter{
+  color: rgb(134, 134, 134);
+}
+
+.filter:hover , .active {
+  color: rgb(0, 0, 0);
+}
+
+.maxHight{
+  max-height: 600px;
+}
