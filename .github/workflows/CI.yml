@@ -18,7 +18,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '18'
-          cache: 'yarn'
+
+      # Cache and install frontend dependencies
+      - name: Cache Yarn dependencies for frontend
+        uses: actions/cache@v3
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-yarn-frontend-${{ hashFiles('frontend/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-frontend-
 
       - name: Install frontend dependencies
         run: |
@@ -34,6 +42,15 @@ jobs:
         run: |
           cd frontend
           yarn run build
+
+      # Cache and install backend dependencies
+      - name: Cache Yarn dependencies for backend
+        uses: actions/cache@v3
+        with:
+          path: backend/node_modules
+          key: ${{ runner.os }}-yarn-backend-${{ hashFiles('backend/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-backend-
 
       - name: Install backend dependencies
         run: |
