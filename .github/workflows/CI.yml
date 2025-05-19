@@ -30,15 +30,15 @@ jobs:
           cd frontend
           yarn run lint
 
-      # - name: Build frontend
-      #   run: |
-      #     cd frontend
-      #     yarn run build
+      - name: Build frontend
+        run: |
+          cd frontend
+          yarn run build
 
-      # - name: Install backend dependencies
-      #   run: |
-      #     cd backend
-      #     yarn install
+      - name: Install backend dependencies
+        run: |
+          cd backend
+          yarn install
 
       - name: Lint backend
         run: |
