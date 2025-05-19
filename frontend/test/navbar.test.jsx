@@ -12,7 +12,6 @@ describe('Navigation component', () => {
         <Navigation />
       </BrowserRouter>
     );
-
     const logo = screen.getByRole('link', { name: /explore/i });
     expect(logo).toBeInTheDocument();
   });
