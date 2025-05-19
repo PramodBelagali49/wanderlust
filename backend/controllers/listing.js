@@ -1,4 +1,4 @@
-const Listing = require('../models/listing.js'); 
+const Listing = require('../models/listing.js');
 const {formatResponse} = require('../utilities/errorHandler');
 
 // Index: Get all listings
