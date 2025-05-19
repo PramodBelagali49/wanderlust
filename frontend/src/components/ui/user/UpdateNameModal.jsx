@@ -10,7 +10,7 @@ const UpdateNameModal = ({ isOpen, onClose }) => {
     const [name, setName] = useState('');
     const [loading, setLoading] = useState(false);
     const { currUser, updateName } = useUserStore();
-    const { showSuccessMessage, showErrorMessage } = useContext(FlashMessageContext);
+    const { showSuccessMessage="sample", showErrorMessage } = useContext(FlashMessageContext);
     
     useEffect(() => {
         if (isOpen && currUser) {

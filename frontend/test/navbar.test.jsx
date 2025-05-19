@@ -1,12 +1,19 @@
-import { describe, it } from 'vitest';  
-import '@testing-library/jest-dom';              
+import React from 'react';
+import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import Navigation from '../path/to/Navigation';
+import '@testing-library/jest-dom';
+import { BrowserRouter } from 'react-router-dom';
+import Navigation from "../src/components/common/Navbar.jsx"
 
-describe('Navigation Component', () => {
-  it('renders the logo link', () => {
-    render(<Navigation />);
-    const logoLink = screen.getByRole('link', { name: /explore/i });
-    expect(logoLink).toBeInTheDocument();
+describe('Navigation component', () => {
+  it('renders the logo with text Explore', () => {
+    render(
+      <BrowserRouter>
+        <Navigation />
+      </BrowserRouter>
+    );
+
+    const logo = screen.getByRole('link', { name: /explore/i });
+    expect(logo).toBeInTheDocument();
   });
 });
