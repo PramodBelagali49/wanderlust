@@ -9,7 +9,7 @@ const NotFound = () => {
         <h1 className="text-9xl font-bold text-rose-500">404</h1>
         <h2 className="text-3xl font-semibold text-gray-800 mt-4">Page Not Found</h2>
         <p className="text-gray-600 mt-2 max-w-md mx-auto">
-          The page you're looking for doesn't exist or has been moved.
+          The page you&apos;re looking for doesn&apos;t exist or has been moved.
         </p>
         <div className="mt-8">
           <Link
@@ -25,4 +25,4 @@ const NotFound = () => {
   );
 };
 
-export default NotFound; 
+export default NotFound;

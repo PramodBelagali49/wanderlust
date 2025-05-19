@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 const NavButton = ({
   onClick, children, variant = 'primary', disabled = false,
@@ -21,4 +22,11 @@ const NavButton = ({
   );
 };
 
-export default NavButton; 
+NavButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
+  variant: PropTypes.oneOf(['primary', 'secondary', 'outline']),
+  disabled: PropTypes.bool,
+};
+
+export default NavButton;

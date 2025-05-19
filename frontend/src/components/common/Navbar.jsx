@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+ 
 import React, {useEffect, useState} from 'react';
 import {Link, useLocation, useNavigate} from 'react-router-dom';
 import useListingStore from '../../store/listing';

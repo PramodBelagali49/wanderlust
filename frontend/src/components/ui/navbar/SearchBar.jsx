@@ -1,7 +1,8 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { IconSearch } from '@tabler/icons-react';
 
-const SearchBar = ({value, onChange, onFocus}) => (
+const SearchBar = ({ value, onChange, onFocus }) => (
   <div className="flex gap-2 w-full">
     <div className="relative flex-1">
       <input
@@ -16,7 +17,6 @@ const SearchBar = ({value, onChange, onFocus}) => (
           if (onFocus && value.trim()) onFocus();
         }}
         onKeyDown={(e) => {
-          // Prevent dropdown from capturing key events intended for input
           e.stopPropagation();
         }}
         placeholder="Search listings..."
@@ -31,4 +31,10 @@ const SearchBar = ({value, onChange, onFocus}) => (
   </div>
 );
 
-export default SearchBar; 
+SearchBar.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+  onFocus: PropTypes.func,
+};
+
+export default SearchBar;

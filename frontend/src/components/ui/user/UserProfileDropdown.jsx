@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import {
   IconCamera,
   IconChevronDown,
@@ -18,7 +19,6 @@ const UserProfileDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -67,7 +67,7 @@ const UserProfileDropdown = ({
           </div>
         ) : (
           <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center">
-            <IconUserCircle size={24} className="text-gray-500"/>
+            <IconUserCircle size={24} className="text-gray-500" />
           </div>
         )}
         <IconChevronDown
@@ -88,7 +88,7 @@ const UserProfileDropdown = ({
               onClick={() => handleOption('update-photo')}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
             >
-              <IconCamera size={16} className="mr-2"/>
+              <IconCamera size={16} className="mr-2" />
               Update Photo
             </button>
 
@@ -96,7 +96,7 @@ const UserProfileDropdown = ({
               onClick={() => handleOption('update-name')}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
             >
-              <IconEdit size={16} className="mr-2"/>
+              <IconEdit size={16} className="mr-2" />
               Update Name
             </button>
 
@@ -104,7 +104,7 @@ const UserProfileDropdown = ({
               onClick={() => handleOption('change-password')}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
             >
-              <IconKey size={16} className="mr-2"/>
+              <IconKey size={16} className="mr-2" />
               Change Password
             </button>
 
@@ -112,7 +112,7 @@ const UserProfileDropdown = ({
               onClick={() => handleOption('logout')}
               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center"
             >
-              <IconLogout size={16} className="mr-2"/>
+              <IconLogout size={16} className="mr-2" />
               Log out
             </button>
           </div>
@@ -122,4 +122,16 @@ const UserProfileDropdown = ({
   );
 };
 
-export default UserProfileDropdown; 
+UserProfileDropdown.propTypes = {
+  user: PropTypes.shape({
+    name: PropTypes.string.isRequired,
+    email: PropTypes.string.isRequired,
+    profilePhoto: PropTypes.string,
+  }).isRequired,
+  onLogout: PropTypes.func.isRequired,
+  onUpdateName: PropTypes.func.isRequired,
+  onUpdatePhoto: PropTypes.func.isRequired,
+  onChangePassword: PropTypes.func.isRequired,
+};
+
+export default UserProfileDropdown;

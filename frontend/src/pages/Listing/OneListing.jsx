@@ -1,4 +1,4 @@
-/* eslint-disable react/prop-types */
+ 
 import React, {useContext, useEffect, useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 import useUserStore from '../../store/userStore';
