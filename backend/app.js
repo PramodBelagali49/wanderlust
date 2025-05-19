@@ -74,7 +74,7 @@ app.use(
   }),
 );
 
-// Improved CORS configuration
+// CORS configuration
 const allowedOrigins = [
   process.env.REACT_APP_API_URL || 'http://localhost:5173',
 ];

@@ -8,10 +8,11 @@
     "main": "app.js",
     "scripts": {
         "start": "node app.js",
-        "dev": "nodemon app.js"
+        "dev": "nodemon app.js",
+        "test": "mocha test/**/*.js"
     },
     "keywords": [],
-    "author": "Jaimin Detroja",
+    "author": "Pramod B",
     "license": "ISC",
     "dependencies": {
         "@firebase/app-compat": "^0.2.45",
@@ -29,7 +30,7 @@
         "express-rate-limit": "^7.1.5",
         "express-session": "^1.18.0",
         "firebase": "^11.0.1",
-        "helmet": "^8.0.0",
+        "helmet": "^8.1.0",
         "joi": "^17.13.1",
         "jsonwebtoken": "^9.0.2",
         "method-override": "^3.0.0",
