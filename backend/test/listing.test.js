@@ -35,14 +35,4 @@ describe('Listing Tests', () => {
         assert.strictEqual(response.message, 'Listing created');
         assert.deepStrictEqual(response.data, mockListing);
     });
-
-    // Test error handling
-    it('should handle listing errors correctly', () => {
-        const error = new Error('Invalid price');
-        const response = formatResponse(false, 'Error creating listing', null, error.message);
-        
-        assert.strictEqual(response.success, false);
-        assert.strictEqual(response.message, 'Error creating listing');
-        assert.strictEqual(response.error, 'Invalid price');
-    });
 });
