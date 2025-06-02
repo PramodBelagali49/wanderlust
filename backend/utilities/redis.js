@@ -1,39 +1,62 @@
 const RedisStore = require("connect-redis").default
 const { createClient } = require("redis")
 
-const redisClient = createClient({
-    password: process.env.REDIS_PASS,
-    socket: {
-        host: "redis-11634.c330.asia-south1-1.gce.redns.redis-cloud.com",
-        port: 11634,
-        reconnectStrategy: (retries) => {
-            if (retries > 5) {
-                console.error(
-                    "Too many Redis reconnection attempts. Exiting..."
-                )
-                return null // Stop retrying after 5 attempts
-            }
-            console.warn(`Retrying Redis connection (${retries} attempts)...`)
-            return Math.min(retries * 100, 3000) // Exponential backoff up to 3 seconds
+let redisClient;
+
+// Only create Redis client if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+    redisClient = createClient({
+        password: process.env.REDIS_PASS,
+        socket: {
+            host: "redis-11634.c330.asia-south1-1.gce.redns.redis-cloud.com",
+            port: 11634,
+            reconnectStrategy: (retries) => {
+                if (retries > 5) {
+                    console.error("Too many Redis reconnection attempts. Exiting...")
+                    return null // Stop retrying after 5 attempts
+                }
+                console.warn(`Retrying Redis connection (${retries} attempts)...`)
+                return Math.min(retries * 100, 3000) // Exponential backoff up to 3 seconds
+            },
         },
-    },
-})
+    });
+} else {
+    // Mock Redis client for testing
+    console.log("Using mock Redis client for testing");
+    redisClient = {
+        connect: () => {
+            console.log("Mock Redis connected");
+            return Promise.resolve();
+        },
+        ping: () => Promise.resolve("PONG"),
+        on: () => {},
+        set: () => Promise.resolve("OK"),
+        get: () => Promise.resolve(null),
+        del: () => Promise.resolve(1),
+        expire: () => Promise.resolve(1),
+        quit: () => Promise.resolve("OK")
+    };
+}
 
 async function initializeRedisClient() {
-    try {
-        await redisClient.connect()
-        console.log("Connected to Redis")
+    if (process.env.NODE_ENV !== 'test') {
+        try {
+            await redisClient.connect()
+            console.log("Connected to Redis")
 
-        const pingResult = await redisClient.ping() // Pinging Redis to check if it's reachable
-        console.log("Redis ping result:", pingResult)
-    } catch (error) {
-        console.error("Redis connection error:", error.message)
-        process.exit(1) // Exit process if Redis connection fails
+            const pingResult = await redisClient.ping()
+            console.log("Redis ping result:", pingResult)
+        } catch (error) {
+            console.error("Redis connection error:", error.message)
+            process.exit(1)
+        }
     }
 }
 
-// Initialize Redis connection
-initializeRedisClient()
+// Initialize Redis connection if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+    initializeRedisClient()
+}
 
 // Initialize store
 const redisStore = new RedisStore({

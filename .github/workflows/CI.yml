@@ -72,4 +72,4 @@ jobs:
         run: |
           cd backend
           yarn add --dev mocha chai
-          npx mocha "test/**/*.test.js" --exit --timeout 10000
+          yarn test

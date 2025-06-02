@@ -9,7 +9,7 @@
     "scripts": {
         "start": "node app.js",
         "dev": "nodemon app.js",
-        "test": "mocha --require test/setup.js test/**/*.test.js --exit --timeout 10000"
+        "test": "mocha test/**/*.test.js --timeout 5000"
     },
     "keywords": [],
     "author": "Pramod B",
