@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, {useEffect, useState} from 'react';
-import {useLocation, useNavigate} from 'react-router-dom';
+import {useLocation} from 'react-router-dom';
 import {ScaleLoader} from 'react-spinners';
 import useUserStore from '../../store/userStore';
 import useListingStore from '../../store/listing';
@@ -24,8 +24,6 @@ import {
   IconTractor,
 } from '@tabler/icons-react';
 import ListingCard from '../../components/ui/listing/ListingCard.jsx';
-import {fetchBookmarks, toggleBookmark} from '../../utils/bookmarkUtils';
-import {FlashMessageContext} from '../../utils/flashMessageContext';
 
 const FILTER_TAGS = [
   {id: 'trending', label: 'Trending', icon: IconFlame},
@@ -180,14 +178,11 @@ const Listings = () => {
   } = useListingStore();
   const {selectedTags, tagClick} = useTagStore();
   const [showWithTax, setShowWithTax] = useState(false);
-  const [displayCurrency, setDisplayCurrency] = useState('USD'); // null = use original currency
+  const [displayCurrency, setDisplayCurrency] = useState('USD');
   const [loading, setLoading] = useState(true);
   const {currUser, checkCurrUser} = useUserStore();
   const {getAllListings} = useListingApi();
-  const [bookmarkedListings, setBookmarkedListings] = useState([]);
-  const navigate = useNavigate();
   const location = useLocation();
-  const {showErrorMessage} = React.useContext(FlashMessageContext);
 
   // Track if we're showing search results
   const [isSearchResults, setIsSearchResults] = useState(false);
@@ -205,21 +200,10 @@ const Listings = () => {
         await checkCurrUser();
       }
       await getAllListings(setLoading);
-      if (currUser) {
-        try {
-          const response = await fetchBookmarks();
-          if (response.success && response.data.bookmarks) {
-            setBookmarkedListings(response.data.bookmarks.map(bookmark => bookmark._id));
-          }
-        } catch (error) {
-          console.error('Error fetching bookmarks:', error);
-        }
-      }
 
       // Check if coming from search
       if (location.state?.fromSearch) {
         setIsSearchResults(true);
-        // Don't update navigation state to avoid infinite loops
       }
     };
 
@@ -230,8 +214,7 @@ const Listings = () => {
   useEffect(() => {
     if (filterListings && filterListings.length > 0) {
       // Calculate total pages
-      const calculatedTotalPages = Math.ceil(filterListings.length /
-          LISTINGS_PER_PAGE);
+      const calculatedTotalPages = Math.ceil(filterListings.length / LISTINGS_PER_PAGE);
       setTotalPages(calculatedTotalPages);
 
       // Reset to page 1 if current page is out of bounds after filter change
@@ -249,13 +232,6 @@ const Listings = () => {
     }
   }, [filterListings, currentPage]);
 
-  //remove bookmarks when user logout
-  useEffect(() => {
-    if (!currUser) {
-      setBookmarkedListings([]);
-    }
-  }, [currUser]);
-
   const handleTagClick = async (tag) => {
     setIsSearchResults(false); // Reset search results state
     await tagClick(tag);
@@ -265,51 +241,6 @@ const Listings = () => {
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
-  };
-
-  // Handle bookmark toggle with optimistic UI update
-  const handleToggleBookmark = async (listingId, newBookmarkStatus) => {
-    if (!currUser) {
-      showErrorMessage('Please log in to bookmark listings');
-      navigate('/login');
-      return;
-    }
-
-    // Optimistically update UI
-    if (newBookmarkStatus) {
-      setBookmarkedListings(prev => [...prev, listingId]);
-    } else {
-      setBookmarkedListings(prev => prev.filter(id => id !== listingId));
-    }
-
-    // Make API call in the background
-    try {
-      const response = await toggleBookmark(listingId, !newBookmarkStatus);
-
-      // If API call failed, revert the UI change
-      if (!response.success) {
-        // Revert the optimistic update
-        if (newBookmarkStatus) {
-          setBookmarkedListings(prev => prev.filter(id => id !== listingId));
-        } else {
-          setBookmarkedListings(prev => [...prev, listingId]);
-        }
-
-        // Show error message only for actual error conditions, not for "already bookmarked" case
-        if (!response.message?.includes('already bookmarked')) {
-          showErrorMessage(response.message || 'Failed to update bookmark');
-        }
-      }
-    } catch (error) {
-      console.error('Error toggling bookmark:', error);
-      // Revert the optimistic update
-      if (newBookmarkStatus) {
-        setBookmarkedListings(prev => prev.filter(id => id !== listingId));
-      } else {
-        setBookmarkedListings(prev => [...prev, listingId]);
-      }
-      showErrorMessage('Failed to update bookmark status');
-    }
   };
 
   if (loading) {
@@ -406,8 +337,6 @@ const Listings = () => {
           listing={listing}
           showWithTax={showWithTax}
           displayCurrency={displayCurrency}
-          isBookmarked={bookmarkedListings.includes(listing._id)}
-          onToggleBookmark={handleToggleBookmark}
       />))}
     </div>
 

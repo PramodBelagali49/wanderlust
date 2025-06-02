@@ -35,6 +35,7 @@ export const register = async (userData) => {
     const response = await axiosInstance.post('/signup', userData);
     if (response.data.success) {
       setToken(response.data.data.token);
+      setUserData(response.data.data.user);
     }
     return response.data;
   } catch (error) {

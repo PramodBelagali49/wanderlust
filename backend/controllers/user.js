@@ -6,6 +6,8 @@ const {AppError, formatResponse} = require('../utilities/errorHandler.js');
 const passport = require('passport');
 const Listing = require('../models/listing.js');
 const crypto = require('crypto');
+const { generateToken } = require('../utilities/tokenUtils.js');
+const { generateSignature } = require('../utilities/cloudinaryUtils.js');
 
 // User signup
 module.exports.signup = async (req, res) => {
@@ -34,6 +36,9 @@ module.exports.signup = async (req, res) => {
   // Save user to database
   const savedUser = await newUser.save();
 
+  // Generate JWT token
+  const token = generateToken(savedUser);
+
   // Create user data
   const data = {
     userId: savedUser._id,
@@ -50,6 +55,7 @@ module.exports.signup = async (req, res) => {
       'User registered successfully',
       {
         user: data,
+        token,
       },
     ));
   });
@@ -67,17 +73,18 @@ module.exports.login = (req, res) => {
     req.login(user, (err) => {
       if (err) {
         throw new AppError('Error during login', 500);
-      }
-      const data = {
+      }      const data = {
         userId: user._id,
         email: user.email,
         name: user.name,
         profilePhoto: user.profilePhoto || '',
       };
+      const token = generateToken(user);
       return res.status(200).json(formatResponse(true,
         'Login successful',
         {
           user: data,
+          token,
         },
       ));
     });
@@ -104,4 +111,46 @@ module.exports.isLogin = (req, res) => {
     }));
   }
   return res.status(401).json(formatResponse(false, 'Not logged in', null));
+};
+
+// Get Cloudinary upload signature
+module.exports.getCloudinarySignature = async (req, res) => {
+  try {
+    const type = req.query.type || 'listing';
+    const folder = type === 'profile' ? 'wanderlust/profiles' : 'wanderlust/listings';
+    
+    // Generate a unique public_id
+    const timestamp = Date.now();
+    const publicId = `${req.user.userId}_${timestamp}`;
+    
+    const signatureData = generateSignature({ 
+      folder,
+      public_id: publicId,
+      timestamp
+    });
+    
+    res.json(formatResponse(true, 'Signature generated successfully', signatureData));
+  } catch (error) {
+    console.error('Error generating Cloudinary signature:', error);
+    throw new AppError('Failed to generate upload signature', 500);
+  }
+};
+
+// Get Cloudinary upload credentials
+module.exports.getCloudinaryCredentials = async (req, res) => {
+  try {
+    const type = req.query.type || 'listing';
+    
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      throw new AppError('Cloudinary configuration missing', 500);
+    }
+
+    // Generate all necessary credentials including signature
+    const credentials = generateSignature({ type });
+    
+    res.json(formatResponse(true, 'Credentials retrieved successfully', credentials));
+  } catch (error) {
+    console.error('Error getting Cloudinary credentials:', error);
+    throw new AppError('Failed to get upload credentials', 500);
+  }
 };

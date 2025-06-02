@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,15 +10,13 @@ const User = require('./models/user');
 const {formatResponse} = require('./utilities/errorHandler');
 const { validatePassword } = require('./utilities/passwordUtils');
 
-if (process.env.NODE_ENV !== 'production') {
-  require('dotenv').config();
-}
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 
 const listingsRoutes = require('./routes/listing.js');
 const reviewsRoutes = require('./routes/review.js');
 const usersRoutes = require('./routes/user.js');
+const uploadRoutes = require('./routes/upload.js');
 const port = process.env.PORT || 3000;
 
 // Database connection
@@ -26,7 +25,7 @@ main().
   catch((err) => console.log(err));
 
 async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/wanderlust")
+  await mongoose.connect(process.env.MONGO_URL)
 }
 
 // Passport configuration
@@ -76,7 +75,7 @@ app.use(
 
 // CORS configuration
 const allowedOrigins = [
-  process.env.REACT_APP_API_URL || 'http://localhost:5173',
+  'http://localhost:5173',
 ];
 
 if (process.env.REACT_APP_API_URL2) {
@@ -88,6 +87,7 @@ const corsOptions = {
     if (!origin || allowedOrigins.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log('Blocked by CORS:', origin);
       callback(new Error('Not allowed by CORS'));
     }
   },
@@ -105,8 +105,7 @@ app.use(
       collectionName: 'sessions'
     }),
     resave: false,
-    saveUninitialized: false,
-    secret: process.env.SECRET,
+    saveUninitialized: false,    secret: process.env.SECRET || 'your-fallback-secret-key',
     name: 'sessionId',
     proxy: true,
     cookie: {
@@ -128,6 +127,7 @@ app.get('/', (req, res) => {
 
 app.use('/listings/:id/reviews', reviewsRoutes);
 app.use('/listings', listingsRoutes);
+app.use('/upload', uploadRoutes);
 app.use('/', usersRoutes);
 
 // 404 handler

@@ -1,11 +1,10 @@
- 
 import React, { useContext, useState, useRef, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { BeatLoader, PulseLoader } from "react-spinners"
 import { FlashMessageContext } from "../../utils/flashMessageContext"
 import useUserStore from "../../store/userStore"
 import { Link } from "react-router-dom"
-import { getCloudinarySignature, uploadToCloudinary, validateImageFile } from "../../utils/cloudinaryUtils"
+import { getCloudinaryCredentials, uploadToCloudinary, validateImageFile } from "../../utils/cloudinaryUtils"
 import axiosInstance from "../../api/axiosInstance"
 import { IconPhoto, IconTrash, IconEdit } from "@tabler/icons-react"
 import TagSelector from "../../components/ui/TagSelector"
@@ -128,9 +127,10 @@ const EditListing = () => {
         const file = event.target.files[0]
         if (!file) return
 
-        const validation = validateImageFile(file)
-        if (!validation) {
-            showErrorMessage(validation.message)
+        try {
+            validateImageFile(file)
+        } catch (error) {
+            showErrorMessage(error.message)
             return
         }
 
@@ -138,12 +138,12 @@ const EditListing = () => {
         clearFlashMessage()
 
         try {
-            const signatureData = await getCloudinarySignature('listing')
-            if (!signatureData || !signatureData.cloud_name || !signatureData.api_key) {
+            const credentials = await getCloudinaryCredentials('listing')
+            if (!credentials || !credentials.cloud_name) {
                 throw new Error('Failed to get upload credentials')
             }
 
-            const imageUrl = await uploadToCloudinary(file, signatureData)
+            const imageUrl = await uploadToCloudinary(file, credentials)
             if (!imageUrl) {
                 throw new Error('No image URL returned from upload')
             }

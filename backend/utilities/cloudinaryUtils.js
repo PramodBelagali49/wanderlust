@@ -9,42 +9,43 @@ require('dotenv').config();
 const generateSignature = (params = {}) => {
   const timestamp = Math.round(new Date().getTime() / 1000);
   
-  // Create the string to sign
-  const paramsToSign = { timestamp, ...params };
+  // Add required parameters
+  const defaultParams = {
+    timestamp,
+    folder: 'wanderwise_dev_listings',
+    ...params
+  };
   
-  // Sort the parameters alphabetically
-  const sortedParams = Object.keys(paramsToSign)
+  // Sort the parameters alphabetically and filter out null/undefined values
+  const sortedParams = Object.keys(defaultParams)
     .sort()
     .reduce((acc, key) => {
-      // Skip api_key and cloud_name as they are not used in signature
-      if (key !== 'api_key' && key !== 'cloud_name') {
-        acc[key] = paramsToSign[key];
+      const value = defaultParams[key];
+      // Skip api_key, cloud_name, and null/undefined values
+      if (key !== 'api_key' && key !== 'cloud_name' && value != null) {
+        acc[key] = value;
       }
       return acc;
     }, {});
   
-  // Create the string to sign in format 'key=value&key2=value2...'
+  // Create the string to sign
   const stringToSign = Object.entries(sortedParams)
     .map(([key, value]) => `${key}=${value}`)
     .join('&');
   
-  console.log('String to sign:', stringToSign);
-  
-  // Generate the signature using SHA-1
+  // Generate the signature
   const signature = crypto
     .createHash('sha1')
-    .update(stringToSign + process.env.CLOUD_API_SECRET)
+    .update(stringToSign + process.env.CLOUDINARY_API_SECRET)
     .digest('hex');
   
-  console.log('Generated signature:', signature);
-  
-  // Return signature and related data
+  // Return all necessary parameters for the upload
   return {
-    signature,
     timestamp,
-    api_key: process.env.CLOUD_API_KEY,
-    cloud_name: process.env.CLOUD_NAME,
-    ...params
+    signature,
+    folder: defaultParams.folder,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME
   };
 };
 

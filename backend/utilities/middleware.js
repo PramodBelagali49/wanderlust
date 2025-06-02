@@ -7,50 +7,71 @@ const {
     listingsSchema
 } = require("./schema.js");
 
-module.exports.verifyToken = (req, res, next) => {
+module.exports.verifyToken = async (req, res, next) => {
     try {
+        // Check for Authorization header
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            console.error('No token provided in Authorization header');
             return res.status(401).json({
                 message: "No token provided",
+                details: "Authorization header is missing or invalid"
             });
         }
 
+        // Check JWT_SECRET configuration
+        if (!process.env.JWT_SECRET) {
+            console.error('JWT_SECRET is not configured');
+            return res.status(500).json({
+                message: "Server configuration error",
+                details: "JWT_SECRET is not properly configured"
+            });
+        }
+
+        // Extract and verify token
         const token = authHeader.split(' ')[1];
         const decoded = verifyToken(token);
-
         
         if (!decoded) {
+            console.error('Token verification failed for token:', token.substring(0, 10) + '...');
             return res.status(401).json({
-                message: "Invalid token",
+                message: "Token verification failed",
+                details: "The provided token is invalid or has expired"
             });
         }
-        
-        User.findById(decoded.userId)
-            .then((user) => {
-                if (user) {
-                    req.user = {
-                        userId: user._id,
-                        email: user.email,
-                        name: user.name,
-                        profilePhoto: user.profilePhoto || '',
-                        isValidatedEmail: user.isValidatedEmail
-                    };
-                    next();
-                } else {
-                    res.status(401).json({
-                        message: "Invalid token: User not found",
-                    });
-                }
-            })
-            .catch((err) => {
-                res.status(401).json({
-                    message: err.message,
+
+        try {
+            // Find user in database
+            const user = await User.findById(decoded.userId);
+            if (!user) {
+                console.error('Token valid but user not found:', decoded.userId);
+                return res.status(401).json({
+                    message: "Invalid token: User not found",
+                    details: "The user associated with this token was not found"
                 });
+            }
+
+            // Set user info in request
+            req.user = {
+                userId: user._id,
+                email: user.email,
+                name: user.name,
+                profilePhoto: user.profilePhoto || '',
+                isValidatedEmail: user.isValidatedEmail
+            };
+            next();
+        } catch (dbError) {
+            console.error('Database error finding user:', dbError);
+            return res.status(500).json({
+                message: "Server error",
+                details: "Failed to validate user"
             });
+        }
     } catch (error) {
+        console.error('Token verification error:', error);
         return res.status(401).json({
             message: "Invalid token",
+            details: error.message
         });
     }
 };

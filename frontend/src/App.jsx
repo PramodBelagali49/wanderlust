@@ -19,7 +19,7 @@ import { FlashMessageProvider } from "./utils/flashMessageContext"
 import FlashMessageDisplay from "./components/common/flashMessageDisplay.jsx"
 import { Toaster } from "react-hot-toast"
 import NotFound from "./pages/NotFound"
-import Bookmarks from "./pages/Bookmarks"
+// import Bookmarks from "./pages/Bookmarks"
 
 const Layout = () => {
     return (
@@ -48,7 +48,6 @@ const router = createBrowserRouter(
             <Route path="/listings/new" element={<NewListing />} />
             <Route path="/listings/:id" element={<OneListing />} />
             <Route path="/listings/:id/edit" element={<EditListing />} />
-            <Route path="/bookmarks" element={<Bookmarks />} />
             <Route path="*" element={<NotFound />} />
         </Route>
     )

@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { BeatLoader } from "react-spinners";
 import useUserStore from "../../store/userStore";
 import { FlashMessageContext } from "../../utils/flashMessageContext";
-import { getCloudinarySignature, uploadToCloudinary, validateImageFile } from "../../utils/cloudinaryUtils";
+import { getCloudinaryCredentials, uploadToCloudinary, validateImageFile } from "../../utils/cloudinaryUtils";
 import { IconCamera, IconUpload, IconCheck } from "@tabler/icons-react";
 
 const ProfileSetup = () => {
@@ -59,12 +59,11 @@ const ProfileSetup = () => {
         
         setUploadingImage(true);
         
-        try {
-            // Get upload signature from backend
-            const signatureData = await getCloudinarySignature('profile');
+        try {            // Get upload credentials from backend
+            const credentials = await getCloudinaryCredentials('profile');
             
             // Upload to Cloudinary
-            const imageUrl = await uploadToCloudinary(selectedFile, signatureData);
+            const imageUrl = await uploadToCloudinary(selectedFile, credentials);
             
             // Update user profile with the uploaded image URL
             const result = await updatePhoto(imageUrl);

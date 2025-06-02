@@ -4,9 +4,10 @@ import {BeatLoader, PulseLoader} from 'react-spinners';
 import {FlashMessageContext} from '../../utils/flashMessageContext';
 import useUserStore from '../../store/userStore';
 import {
-  getCloudinarySignature,
+  getCloudinaryCredentials,
   uploadToCloudinary,
   validateImageFile,
+  uploadImage,
 } from '../../utils/cloudinaryUtils';
 import {IconPhoto, IconTrash} from '@tabler/icons-react';
 import TagSelector from '../../components/ui/TagSelector';
@@ -119,6 +120,7 @@ const NewListing = () => {
         price: finalPrice, // Always sends price in USD to backend
         tagsArray: formData.tags,
         image: imageFile,
+        owner: currUser.userId // Add owner ID
       };
 
       const response = await sendData(data);
@@ -149,52 +151,25 @@ const NewListing = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    // Validate the image file
-    const validation = validateImageFile(file);
-    if (!validation) {
-      showErrorMessage(validation.message);
-      return;
-    }
-
-    // Create a preview of the selected image
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target.result);
-    };
-    reader.readAsDataURL(file);
-
     setImageLoader(true);
     clearFlashMessage();
 
     try {
-      // Get signature from backend
-      const signatureData = await getCloudinarySignature('listing');
-
-      if (!signatureData || !signatureData.cloud_name ||
-          !signatureData.api_key) {
-        throw new Error('Failed to get upload credentials');
-      }
-
-      // Upload to Cloudinary with signature
-      const imageUrl = await uploadToCloudinary(file, signatureData);
-
-      if (!imageUrl) {
-        throw new Error('No image URL returned from upload');
-      }
-
-      // Set the returned URL
-      setImageFile(imageUrl);
-      showSuccessMessage('Image uploaded successfully');
+        // Upload image directly
+        const imageUrl = await uploadImage(file, 'listing');
+        setImageFile(imageUrl);
+        setImagePreview(URL.createObjectURL(file));
+        showSuccessMessage('Image uploaded successfully');
     } catch (error) {
-      console.error('Image upload failed:', error);
-      showErrorMessage(error.message || 'Failed to upload image');
-      // Reset the file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      setImagePreview(null);
+        console.error('Image upload failed:', error);
+        showErrorMessage(error.message || 'Failed to upload image');
+        // Reset the file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        setImagePreview(null);
     } finally {
-      setImageLoader(false);
+        setImageLoader(false);
     }
   };
 

@@ -9,10 +9,14 @@ module.exports.createReview = (req, res) => {
     const {
         rating,
         content
-    } = req.body;
-
-    Listing.findById(id)
+    } = req.body;    Listing.findById(id)
         .then((listing) => {
+            if (!content) {
+                throw new Error('Review content is required');
+            }
+            if (!rating || rating < 1 || rating > 5) {
+                throw new Error('Rating must be between 1 and 5');
+            }
             const newReview = new Review({
                 content,
                 rating: parseInt(rating),
