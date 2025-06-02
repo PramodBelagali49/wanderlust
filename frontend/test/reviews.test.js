@@ -1,21 +1,20 @@
 import { describe, it, expect } from 'vitest';
 import { calculateAverageRating, calculateRatingDistribution } from '../src/utils/reviewUtils';
 
-describe('Review System Tests', () => {
-    // Test average rating calculation
+describe('Review System Tests', () => {    // Test average rating calculation
     it('should calculate correct average rating', () => {
         const reviews = [
             { rating: 5 },
             { rating: 4 },
             { rating: 3 }
         ];
-        const average = calculateAverageRating(reviews);
+        const average = parseFloat(calculateAverageRating(reviews));
         expect(average).toBe(4);
     });
 
     // Test empty reviews handling
     it('should handle empty reviews', () => {
-        const average = calculateAverageRating([]);
+        const average = parseFloat(calculateAverageRating([]));
         expect(average).toBe(0);
     });
 
@@ -42,7 +41,7 @@ describe('Review System Tests', () => {
             { rating: 4 },
             { rating: -1 } // Invalid rating
         ];
-        const average = calculateAverageRating(reviews.filter(r => r.rating >= 1 && r.rating <= 5));
+        const average = parseFloat(calculateAverageRating(reviews.filter(r => r.rating >= 1 && r.rating <= 5)));
         expect(average).toBe(4);
     });
 });

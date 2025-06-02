@@ -41,8 +41,8 @@ jobs:
       - name: Run frontend tests
         run: |
           cd frontend
-          yarn add --dev vitest jsdom @testing-library/react
-          yarn test
+          yarn add --dev vitest jsdom @testing-library/react @testing-library/jest-dom
+          yarn test --run
 
       - name: Build frontend
         run: |
@@ -71,5 +71,5 @@ jobs:
       - name: Run backend tests
         run: |
           cd backend
-          yarn add --dev mocha
-          npx mocha "test/simple.test.js" --exit
+          yarn add --dev mocha chai
+          npx mocha "test/**/*.test.js" --exit --timeout 10000
