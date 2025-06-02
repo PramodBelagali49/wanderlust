@@ -38,6 +38,12 @@ jobs:
           cd frontend
           yarn run lint
 
+      - name: Run frontend tests
+        run: |
+          cd frontend
+          yarn add --dev vitest jsdom @testing-library/react
+          yarn test
+
       - name: Build frontend
         run: |
           cd frontend
@@ -62,12 +68,8 @@ jobs:
           cd backend
           npx eslint .
 
-      - name: Install test framework (Mocha)
-        run: |
-          cd backend
-          yarn add --dev mocha
-
       - name: Run backend tests
         run: |
           cd backend
-          npx mocha test/**/*.js
+          yarn add --dev mocha chai mongodb-memory-server
+          yarn test

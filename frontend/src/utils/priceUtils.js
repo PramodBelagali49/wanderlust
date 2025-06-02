@@ -14,7 +14,19 @@ export const convertUSDtoINR = (price) => {
 
 // Format price based on currency
 export const formatPrice = (price, currency = 'USD') => {
-    return currency === 'USD'
-        ? price.toLocaleString('en-US', { maximumFractionDigits: 2 })
-        : Math.round(price).toLocaleString('en-IN');
-}; 
+    const symbol = currency === 'USD' ? '$' : '₹';
+    const absPrice = Math.abs(price);
+    const sign = price < 0 ? '-' : '';
+    return `${sign}${symbol}${absPrice.toLocaleString('en-US')}`;
+};
+
+export const convertCurrency = (amount, fromCurrency, toCurrency, rate = USD_TO_INR_RATE) => {
+    if (fromCurrency === toCurrency) return amount;
+    if (fromCurrency === 'USD' && toCurrency === 'INR') {
+        return Math.round(amount * rate);
+    }
+    if (fromCurrency === 'INR' && toCurrency === 'USD') {
+        return Math.round(amount / rate);
+    }
+    return amount;
+};
