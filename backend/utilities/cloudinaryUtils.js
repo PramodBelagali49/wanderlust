@@ -12,40 +12,43 @@ const generateSignature = (params = {}) => {
   // Add required parameters
   const defaultParams = {
     timestamp,
-    folder: 'wanderwise_dev_listings',
+    folder: 'wanderwise_dev_listings',  // default folder based on type
+    resource_type: 'image',
+    overwrite: true,  // Always include overwrite in signature
     ...params
   };
   
-  // Sort the parameters alphabetically and filter out null/undefined values
+  // Sort the parameters alphabetically
   const sortedParams = Object.keys(defaultParams)
     .sort()
     .reduce((acc, key) => {
-      const value = defaultParams[key];
-      // Skip api_key, cloud_name, and null/undefined values
-      if (key !== 'api_key' && key !== 'cloud_name' && value != null) {
-        acc[key] = value;
+      // Skip api_key and cloud_name as they are not used in signature
+      if (key !== 'api_key' && key !== 'cloud_name') {
+        acc[key] = defaultParams[key];
       }
       return acc;
     }, {});
   
-  // Create the string to sign
+  // Create the string to sign in format 'key=value&key2=value2...'
   const stringToSign = Object.entries(sortedParams)
     .map(([key, value]) => `${key}=${value}`)
     .join('&');
   
-  // Generate the signature
+  console.log('String to sign:', stringToSign);
+  
+  // Generate the signature using SHA-1
   const signature = crypto
     .createHash('sha1')
-    .update(stringToSign + process.env.CLOUDINARY_API_SECRET)
+    .update(stringToSign + process.env.CLOUD_API_SECRET)
     .digest('hex');
   
-  // Return all necessary parameters for the upload
+  console.log('Generated signature:', signature);
+    // Return signature and related data  // Return exact parameters that were signed, plus API credentials
   return {
-    timestamp,
+    ...sortedParams,  // Include all parameters that were used in signature
     signature,
-    folder: defaultParams.folder,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME
+    api_key: process.env.CLOUD_API_KEY,
+    cloud_name: process.env.CLOUD_NAME
   };
 };
 

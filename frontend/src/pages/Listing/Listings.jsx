@@ -204,6 +204,9 @@ const Listings = () => {
       // Check if coming from search
       if (location.state?.fromSearch) {
         setIsSearchResults(true);
+      } else {
+        // Apply tag filtering after listings are loaded
+        filterListingsOnTag();
       }
     };
 
