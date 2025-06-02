@@ -140,17 +140,13 @@ module.exports.getCloudinarySignature = async (req, res) => {
 module.exports.getCloudinaryCredentials = async (req, res) => {
   try {
     const type = req.query.type || 'listing';
-    const folder = type === 'profile' ? 'wanderlust/profiles' : 'wanderlust/listings';
     
-    if (!process.env.CLOUD_NAME || !process.env.CLOUD_API_KEY) {
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
       throw new AppError('Cloudinary configuration missing', 500);
-    }    const credentials = {
-      cloud_name: process.env.CLOUD_NAME,
-      api_key: process.env.CLOUD_API_KEY,
-      folder,
-      timestamp: Math.round(new Date().getTime() / 1000),
-      signature: generateSignature({ folder }).signature
-    };
+    }
+
+    // Generate all necessary credentials including signature
+    const credentials = generateSignature({ type });
     
     res.json(formatResponse(true, 'Credentials retrieved successfully', credentials));
   } catch (error) {

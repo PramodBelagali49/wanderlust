@@ -12,6 +12,7 @@ import {
   IconTax,
   IconTrash,
   IconWorld,
+  IconUserCircle,
 } from '@tabler/icons-react';
 import '../../rating.css';
 
@@ -22,6 +23,7 @@ import Review from '../../components/ui/listing/Review';
 import {deleteListing} from '../../api/index.js';
 
 const ADMIN_ID = '66a343a50ff99cdefc1a4657';
+const DEFAULT_OWNER_NAME = 'pramod_belagali';
 
 const ListingDetail = () => {
   const navigate = useNavigate();
@@ -47,7 +49,23 @@ const ListingDetail = () => {
         const listingData = result.success ? result.data : result;
         
         if (listingData) {
-          setListing(listingData);
+          console.log('Full Listing Data:', listingData);
+          console.log('Owner Data:', listingData.owner);
+          
+          // Ensure owner data is properly structured with required fields
+          const ownerData = {
+            _id: listingData.owner?._id || '',
+            name: listingData.owner?.name || DEFAULT_OWNER_NAME,
+            email: listingData.owner?.email || '',
+            profilePhoto: listingData.owner?.profilePhoto || ''
+          };
+
+          console.log('Processed Owner Data:', ownerData);
+          
+          setListing({
+            ...listingData,
+            owner: ownerData
+          });
           setReviews(listingData.reviews || []);
         } else {
           showErrorMessage('Listing not found');
@@ -64,6 +82,14 @@ const ListingDetail = () => {
 
     fetchListingDetails();
   }, [id, currUser]);
+
+  // Add debug log for listing state changes
+  useEffect(() => {
+    if (listing) {
+      console.log('Current Listing State:', listing);
+      console.log('Current Owner Data:', listing.owner);
+    }
+  }, [listing]);
 
   const handleDelete = async () => {
     setIsDeletingListing(true);
@@ -92,9 +118,12 @@ const ListingDetail = () => {
     );
   }
 
+  // Allow edit/delete only for the actual owner or admin
   const canModifyListing = Boolean(
-    currUser &&
-    (currUser.userId === listing?.owner?._id || currUser.userId === ADMIN_ID),
+    currUser && (
+      currUser.userId === ADMIN_ID || 
+      currUser.userId === listing?.owner?._id
+    )
   );
 
   return (
@@ -112,9 +141,16 @@ const ListingDetail = () => {
 
         <div className="p-6">
           <div className="flex justify-between items-start mb-6">
-            <h1 className="text-2xl font-bold">
-              {listing?.title}
-            </h1>
+            <div>
+              <h1 className="text-2xl font-bold mb-2">
+                {listing?.title}
+              </h1>
+              {listing?.owner && (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <span>Hosted by {listing.owner.name}</span>
+                </div>
+              )}
+            </div>
 
             <div className="flex items-center gap-1">
               <div className="flex border rounded-md overflow-hidden">
@@ -146,11 +182,20 @@ const ListingDetail = () => {
             </div>
           </div>
 
-          <OwnerInfo
-            owner={listing?.owner}
-            listingTitle={listing?.title}
-            canModifyListing={canModifyListing}
-          />
+          {/* Host Information Section */}
+          <div className="mb-8 border-b pb-8">
+            <h2 className="text-lg font-medium mb-4 text-gray-900 flex items-center gap-2">
+              <IconUserCircle size={24} className="text-purple-500" />
+              Meet Your Host
+            </h2>
+            {listing?.owner && (
+              <OwnerInfo
+                owner={listing.owner}
+                listingTitle={listing.title}
+                canModifyListing={canModifyListing}
+              />
+            )}
+          </div>
 
           <div className="mb-6">
             <h2 className="text-lg font-medium mb-2">About this place</h2>
@@ -200,6 +245,7 @@ const ListingDetail = () => {
             </div>
           )}
 
+          {/* Edit/Delete buttons - Only show for owners/admin */}
           {canModifyListing && (
             <div className="flex gap-4 mt-8 pt-4 border-t">
               <button

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { IconStar, IconUserCircle } from '@tabler/icons-react';
 
-const ReviewItem = ({ review, onDelete, canDelete, isDeleting }) => {
+const ReviewItem = ({ review, onDelete, canDelete = false, isDeleting = false }) => {
     if (!review?.rating) return null;
     
     return (
@@ -77,9 +77,9 @@ ReviewItem.propTypes = {
             profilePhoto: PropTypes.string
         })
     }).isRequired,
-    onDelete: PropTypes.func.isRequired,
-    canDelete: PropTypes.bool.isRequired,
-    isDeleting: PropTypes.bool.isRequired
+    onDelete: PropTypes.func,
+    canDelete: PropTypes.bool,
+    isDeleting: PropTypes.bool
 };
 
 export default ReviewItem;

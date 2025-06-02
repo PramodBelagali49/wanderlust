@@ -46,20 +46,41 @@ module.exports.searchListings = (req, res) => {
 module.exports.singleListing = async (req, res) => {
     const { id } = req.params;
     try {
+        console.log('Fetching listing with ID:', id);
         const listing = await Listing.findById(id)
             .populate({
                 path: 'reviews',
                 populate: {
                     path: 'owner',
+                    select: 'name email profilePhoto'
                 },
             })
-            .populate('owner');
+            .populate({
+                path: 'owner',
+                select: 'name email profilePhoto'
+            });
         
         if (!listing) {
+            console.log('Listing not found');
             return res.status(404).json(formatResponse(false, 'Listing not found'));
         }
+
+        // Debug log to check owner data
+        // console.log('Listing owner data:', {
+        //     id: listing.owner?._id,
+        //     name: listing.owner?.name,
+        //     email: listing.owner?.email,
+        //     profilePhoto: listing.owner?.profilePhoto
+        // });
+        
+        if (!listing.owner) {
+            console.log('Owner data missing');
+            return res.status(400).json(formatResponse(false, 'Owner data missing'));
+        }
+        
         res.json(formatResponse(true, 'Listing retrieved successfully', listing));
     } catch (error) {
+        console.error('Error in singleListing:', error);
         res.status(500).json(formatResponse(false, 'Error retrieving listing', null, error.message));
     }
 };

@@ -7,6 +7,7 @@ import {
   getCloudinaryCredentials,
   uploadToCloudinary,
   validateImageFile,
+  uploadImage,
 } from '../../utils/cloudinaryUtils';
 import {IconPhoto, IconTrash} from '@tabler/icons-react';
 import TagSelector from '../../components/ui/TagSelector';
@@ -119,6 +120,7 @@ const NewListing = () => {
         price: finalPrice, // Always sends price in USD to backend
         tagsArray: formData.tags,
         image: imageFile,
+        owner: currUser.userId // Add owner ID
       };
 
       const response = await sendData(data);
@@ -149,50 +151,25 @@ const NewListing = () => {
     const file = event.target.files[0];
     if (!file) return;
 
-    try {
-      validateImageFile(file);
-    } catch (error) {
-      showErrorMessage(error.message);
-      return;
-    }
-
-    // Create a preview of the selected image
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      setImagePreview(e.target.result);
-    };
-    reader.readAsDataURL(file);
-
     setImageLoader(true);
     clearFlashMessage();
 
     try {
-      const credentials = await getCloudinaryCredentials('listing');
-
-      if (!credentials || !credentials.cloud_name) {
-        throw new Error('Failed to get upload credentials');
-      }
-
-      // Upload to Cloudinary with credentials
-      const imageUrl = await uploadToCloudinary(file, credentials);
-
-      if (!imageUrl) {
-        throw new Error('No image URL returned from upload');
-      }
-
-      // Set the returned URL
-      setImageFile(imageUrl);
-      showSuccessMessage('Image uploaded successfully');
+        // Upload image directly
+        const imageUrl = await uploadImage(file, 'listing');
+        setImageFile(imageUrl);
+        setImagePreview(URL.createObjectURL(file));
+        showSuccessMessage('Image uploaded successfully');
     } catch (error) {
-      console.error('Image upload failed:', error);
-      showErrorMessage(error.message || 'Failed to upload image');
-      // Reset the file input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-      setImagePreview(null);
+        console.error('Image upload failed:', error);
+        showErrorMessage(error.message || 'Failed to upload image');
+        // Reset the file input
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+        setImagePreview(null);
     } finally {
-      setImageLoader(false);
+        setImageLoader(false);
     }
   };
 

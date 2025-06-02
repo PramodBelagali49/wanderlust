@@ -16,6 +16,7 @@ const MongoStore = require('connect-mongo');
 const listingsRoutes = require('./routes/listing.js');
 const reviewsRoutes = require('./routes/review.js');
 const usersRoutes = require('./routes/user.js');
+const uploadRoutes = require('./routes/upload.js');
 const port = process.env.PORT || 3000;
 
 // Database connection
@@ -126,6 +127,7 @@ app.get('/', (req, res) => {
 
 app.use('/listings/:id/reviews', reviewsRoutes);
 app.use('/listings', listingsRoutes);
+app.use('/upload', uploadRoutes);
 app.use('/', usersRoutes);
 
 // 404 handler
