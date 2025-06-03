@@ -7,6 +7,7 @@ export const useListingApi = () => {
     const setFilterListings = useListingStore((state) => state.setFilterListings);    const getAllListings = async (setLoading) => {
         try {
             const response = await axiosInstance.get('/listings');
+            console.log(response)
             const listings = response.data.success ? response.data.data : [];
             setListings(listings);
             setFilterListings(listings);
