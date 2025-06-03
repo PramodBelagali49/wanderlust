@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { clearAuthData } from '../utils/tokenUtils';
 
-const BASE_URL = 'https://wanderlust-backend-1fth.onrender.com';
+const BASE_URL = 'https://wanderlust-backend-1fth.onrender.com/api';
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -9,7 +9,8 @@ const axiosInstance = axios.create({
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
-    }
+    },
+    timeout: 10000 // 10 second timeout
 });
 
 // Add request interceptor for debugging
@@ -25,7 +26,23 @@ axiosInstance.interceptors.response.use(
         return response;
     },
     error => {
-        console.error('API Error:', error.response?.status, error.response?.data || error.message);
+        if (error.response) {
+            // Server responded with error
+            console.error('Server Error:', {
+                status: error.response.status,
+                data: error.response.data,
+                url: error.config.url
+            });
+        } else if (error.request) {
+            // Request made but no response
+            console.error('Network Error:', {
+                url: error.config.url,
+                message: 'No response received'
+            });
+        } else {
+            // Error in request configuration
+            console.error('Request Error:', error.message);
+        }
         return Promise.reject(error);
     }
 );

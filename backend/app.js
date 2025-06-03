@@ -70,20 +70,27 @@ app.use(
     crossOriginOpenerPolicy: {
       policy: 'unsafe-none',
     },
+    crossOriginEmbedderPolicy: false,
   }),
 );
 
 // CORS configuration
 const allowedOrigins = [
   'https://wanderlust-frontend-8a4h.onrender.com',
-  'http://localhost:5173', // keeping localhost for development
+  'https://wanderlust-backend-1fth.onrender.com',
+  'http://localhost:5173',
+  'http://localhost:3000'
 ];
 
 const corsOptions = {
-  origin: allowedOrigins,
+  origin: function(origin, callback) {
+    callback(null, true); // Allow all origins temporarily for debugging
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   exposedHeaders: ['set-cookie'],
+  maxAge: 86400, // 24 hours in seconds
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin', 'X-Timestamp']
 };
 
 app.use(cors(corsOptions));
