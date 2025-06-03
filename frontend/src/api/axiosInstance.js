@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { clearAuthData } from '../utils/tokenUtils';
 
-const BASE_URL = 'https://wanderlust-backend-1fth.onrender.com';
+const BASE_URL = 'https://wanderlust-backend-o4pm.onrender.com/';
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
