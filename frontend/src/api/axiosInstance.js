@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { clearAuthData } from '../utils/tokenUtils';
 
-const BASE_URL = 'https://wanderlust-backend-1fth.onrender.com/api';
+const BASE_URL = 'https://wanderlust-backend-1fth.onrender.com';
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
@@ -15,7 +15,8 @@ const axiosInstance = axios.create({
 
 // Add request interceptor for debugging
 axiosInstance.interceptors.request.use(request => {
-    console.log('Starting Request:', request.url);
+    console.log('Starting Request:', request.method.toUpperCase(), request.url);
+    console.log('Request Headers:', request.headers);
     return request;
 });
 

@@ -17,7 +17,7 @@ export default defineConfig({
         host: true,
         cors: true,
         proxy: {
-            "/api": {
+            "/": {
                 target: "https://wanderlust-frontend-8a4h.onrender.com",
                 changeOrigin: true,
                 secure: false,
