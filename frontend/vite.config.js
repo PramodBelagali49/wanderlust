@@ -13,10 +13,9 @@ export default defineConfig({
     optimizeDeps: {
         exclude: ['react-router-dom', 'react-hot-toast']
     },    server: {
-        port: 5173,
-        proxy: {
+        port: 5173,        proxy: {
             "/api": {
-                target: "http://localhost:3000",
+                target: "https://wanderlust-frontend-8a4h.onrender.com",
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ""),
             },

@@ -75,12 +75,9 @@ app.use(
 
 // CORS configuration
 const allowedOrigins = [
-  'http://localhost:5173',
+  'https://wanderlust-frontend-8a4h.onrender.com',
+  'http://localhost:5173', // keeping localhost for development
 ];
-
-if (process.env.REACT_APP_API_URL2) {
-  allowedOrigins.push(process.env.REACT_APP_API_URL2);
-}
 
 const corsOptions = {
   origin: function(origin, callback) {
@@ -107,12 +104,12 @@ app.use(
     resave: false,
     saveUninitialized: false,    secret: process.env.JWT_SECRET || 'your-fallback-secret-key',
     name: 'sessionId',
-    proxy: true,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
+    proxy: true,    cookie: {
+      secure: true, // Always use secure cookies
       maxAge: 1000 * 3600 * 2, // 2 hours
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+      sameSite: 'none', // Required for cross-site requests
       httpOnly: true,
+      domain: '.onrender.com' // Allow cookies for all subdomains of onrender.com
     },
   }),
 );
