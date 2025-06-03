@@ -6,7 +6,29 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
     withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+    }
 });
+
+// Add request interceptor for debugging
+axiosInstance.interceptors.request.use(request => {
+    console.log('Starting Request:', request.url);
+    return request;
+});
+
+// Add response interceptor for debugging
+axiosInstance.interceptors.response.use(
+    response => {
+        console.log('Response:', response.status, response.data);
+        return response;
+    },
+    error => {
+        console.error('API Error:', error.response?.status, error.response?.data || error.message);
+        return Promise.reject(error);
+    }
+);
 
 // Request interceptor
 axiosInstance.interceptors.request.use(

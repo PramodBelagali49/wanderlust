@@ -101,11 +101,11 @@ app.use(cors(corsOptions));
 app.use(
   session({
     store: MongoStore.create({
-      mongoUrl: "mongodb://127.0.0.1:27017/wanderlust",
+      mongoUrl: process.env.MONGO_URL,
       collectionName: 'sessions'
     }),
     resave: false,
-    saveUninitialized: false,    secret: process.env.SECRET || 'your-fallback-secret-key',
+    saveUninitialized: false,    secret: process.env.JWT_SECRET || 'your-fallback-secret-key',
     name: 'sessionId',
     proxy: true,
     cookie: {
@@ -121,14 +121,15 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // API routes
+// Mount routes in correct order
+app.use('/listings', listingsRoutes);
+app.use('/listings/:id/reviews', reviewsRoutes);
+app.use('/upload', uploadRoutes);
+app.use('/', usersRoutes);
+
 app.get('/', (req, res) => {
   res.redirect('/listings');
 });
-
-app.use('/listings/:id/reviews', reviewsRoutes);
-app.use('/listings', listingsRoutes);
-app.use('/upload', uploadRoutes);
-app.use('/', usersRoutes);
 
 // 404 handler
 app.use((req, res) => {

@@ -10,10 +10,13 @@ export default defineConfig({
         environment: 'jsdom',
         globals: true,
     },
-    server: {
+    optimizeDeps: {
+        exclude: ['react-router-dom', 'react-hot-toast']
+    },    server: {
+        port: 5173,
         proxy: {
             "/api": {
-                target: process.env.VITE_API_BASE_URL, // Use the environment variable
+                target: "http://localhost:3000",
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ""),
             },
