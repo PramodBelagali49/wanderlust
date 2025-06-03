@@ -4,9 +4,11 @@ const { formatResponse } = require('../utilities/errorHandler');
 // Index: Get all listings
 module.exports.index = async (req, res) => {
     try {
-        console.log('Fetching listings...');
+        console.log('Request received for listings');
+        console.log('Headers:', req.headers);
         const listings = await Listing.find({}).populate('owner');
         console.log(`Found ${listings.length} listings`);
+        console.log('Sending response');
         res.json(formatResponse(true, 'Listings retrieved successfully', listings));
     } catch (e) {
         console.error('Error in index controller:', e);

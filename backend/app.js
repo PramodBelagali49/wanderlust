@@ -80,14 +80,7 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-  origin: function(origin, callback) {
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      console.log('Blocked by CORS:', origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: allowedOrigins,
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   exposedHeaders: ['set-cookie'],
@@ -109,7 +102,6 @@ app.use(
       maxAge: 1000 * 3600 * 2, // 2 hours
       sameSite: 'none', // Required for cross-site requests
       httpOnly: true,
-      domain: '.onrender.com' // Allow cookies for all subdomains of onrender.com
     },
   }),
 );
@@ -133,11 +125,11 @@ app.use((req, res) => {
   res.status(404).json(formatResponse(false, 'Route not found'));
 });
 
-app.use((err, req, res) => {
-  console.error(err.stack);
+app.use((err, req, res, next) => {
+  console.error('Error:', err);
   const statusCode = err.statusCode || 500;
   const message = err.message || 'Internal Server Error';
-  res.status(statusCode).json(formatResponse(false, message));
+  res.status(statusCode).json(formatResponse(false, message, null, err.stack));
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
