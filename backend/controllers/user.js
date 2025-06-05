@@ -17,13 +17,11 @@ module.exports.signup = async (req, res) => {
     throw new AppError('Email, password, and name are required', 422);
   }
 
-  // Check if user already exists
   const existingUser = await User.findOne({email});
   if (existingUser) {
     throw new AppError('Email already in use', 409);
   }
 
-  // Hash the password
   const hashedPassword = await hashPassword(password);
 
   // Create new user
