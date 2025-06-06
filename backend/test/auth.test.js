@@ -13,7 +13,6 @@ describe('Authentication Tests', () => {
         assert.notStrictEqual(hashedPassword, password);
         assert.strictEqual(hashedPassword.startsWith('$2'), true);
     });
-
     // Test password validation
     it('should validate password format', () => {
         const validPassword = 'StrongPass123';
